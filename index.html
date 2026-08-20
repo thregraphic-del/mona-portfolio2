@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="author" content="Mona" />
+<meta name="description" content="محللة أعمال وذكاء أعمال — تحويل البيانات إلى قرارات استراتيجية عبر لوحات معلومات تفاعلية وتحليلات دقيقة" />
+<title>منى | محللة أعمال وذكاء أعمال</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;800;900&family=Bodoni+Moda:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<style>
+:root{
+  --bg:#07061a;
+  --bg-2:#0d0a24;
+  --bg-3:#14102e;
+  --line:rgba(167,139,250,.10);
+  --line-2:rgba(167,139,250,.22);
+  --text:#f5f5f5;
+  --muted:#b0acc9;
+  --gold:#a78bfa;
+  --gold-2:#7c3aed;
+  --gold-3:#c4b5fd;
+  --gold-soft:rgba(167,139,250,.14);
+  --chrome-1:#ffffff;
+  --chrome-2:#c9c9d6;
+  --chrome-3:#8b88a8;
+  --success:#4ade80;
+  --radius:18px;
+  --radius-sm:12px;
+  --shadow:0 30px 60px -20px rgba(88,28,135,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Tajawal','Cairo',sans-serif;line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+::selection{background:var(--gold);color:#000}
+
+/* Background ambience */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1200px 600px at 85% -10%,rgba(139,92,246,.18),transparent 60%),
+    radial-gradient(900px 500px at 10% 20%,rgba(124,58,237,.14),transparent 60%),
+    radial-gradient(700px 400px at 50% 120%,rgba(167,139,250,.10),transparent 60%);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
+  background-image:radial-gradient(rgba(167,139,250,.08) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+main,header,footer{position:relative;z-index:1}
+
+/* NAVBAR */
+.nav{
+  position:fixed;inset:0 0 auto 0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:rgba(7,6,26,.75);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:1280px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;gap:20px;justify-content:space-between;
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.5px}
+.brand-mark{
+  width:38px;height:38px;border-radius:12px;
+  background:linear-gradient(135deg,var(--gold-3),var(--gold-2));
+  display:grid;place-items:center;color:#fff;font-weight:900;
+  box-shadow:0 8px 20px rgba(124,58,237,.5);
+}
+.brand small{color:var(--muted);font-weight:500;display:block;font-size:11px}
+.nav-links{display:flex;gap:6px}
+.nav-links a{
+  padding:10px 14px;border-radius:10px;color:var(--muted);font-weight:500;font-size:14px;
+  transition:.25s;
+}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;
+  border:1px solid transparent;cursor:pointer;transition:.25s;font-family:inherit;
+}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;box-shadow:0 10px 24px rgba(124,58,237,.45)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(124,58,237,.6)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line-2)}
+.btn-ghost:hover{background:rgba(255,255,255,.04);border-color:var(--gold)}
+.burger{display:none;background:none;border:1px solid var(--line-2);color:#fff;width:42px;height:42px;border-radius:10px;cursor:pointer}
+
+/* HERO */
+.hero{
+  padding:150px 24px 90px;max-width:1280px;margin:0 auto;
+  display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:999px;
+  background:var(--gold-soft);color:var(--gold-3);
+  border:1px solid rgba(167,139,250,.3);font-size:13px;font-weight:600;margin-bottom:24px;
+}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(74,222,128,.18);animation:pulse 2s infinite}
+@keyframes pulse{50%{transform:scale(1.2);opacity:.7}}
+.hero h1{
+  font-family:'Bodoni Moda',serif;font-weight:900;
+  font-size:clamp(60px,9vw,120px);line-height:1;margin-bottom:20px;
+  letter-spacing:-1px;
+  direction:ltr;text-align:right;
+}
+.hero h1 .line{display:block}
+.hero h1 .off-white{
+  background:linear-gradient(180deg,
+    #ffffff 0%,
+    #f5f5f7 20%,
+    #d4d4d9 45%,
+    #9b9ba3 62%,
+    #ffffff 78%,
+    #cfcfd4 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:
+    drop-shadow(0 3px 0 rgba(0,0,0,.5))
+    drop-shadow(0 10px 20px rgba(0,0,0,.7))
+    drop-shadow(0 18px 40px rgba(0,0,0,.5))
+    drop-shadow(0 0 60px rgba(167,139,250,.25));
+}
+.hero h1 .grad{
+  background:linear-gradient(180deg,
+    #d4bcff 0%,
+    #a78bfa 35%,
+    #7c3aed 65%,
+    #5b21b6 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:
+    drop-shadow(0 3px 0 rgba(0,0,0,.5))
+    drop-shadow(0 10px 20px rgba(0,0,0,.7))
+    drop-shadow(0 6px 24px rgba(124,58,237,.55));
+}
+/* Pills under name */
+.hero-pills{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;
+}
+.hero-pills .pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:999px;
+  font-size:13px;font-weight:700;color:var(--gold-3);
+  background:linear-gradient(135deg,rgba(167,139,250,.16),rgba(124,58,237,.08));
+  border:1px solid rgba(167,139,250,.35);
+  box-shadow:0 4px 14px rgba(124,58,237,.18),inset 0 0 20px rgba(167,139,250,.08);
+  transition:.25s;
+}
+.hero-pills .pill::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--gold-3);
+  box-shadow:0 0 8px var(--gold-3),0 0 14px rgba(167,139,250,.6);
+  animation:pillGlow 2.5s ease-in-out infinite;
+}
+.hero-pills .pill:nth-child(2)::before{animation-delay:.8s}
+.hero-pills .pill:nth-child(3)::before{animation-delay:1.6s}
+@keyframes pillGlow{
+  0%,100%{opacity:.7;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.3)}
+}
+.hero-pills .pill:hover{
+  transform:translateY(-2px);
+  border-color:var(--gold);
+  box-shadow:0 6px 20px rgba(124,58,237,.35);
+}
+.hero .name-tag{
+  font-family:'Tajawal','Cairo',sans-serif;font-size:clamp(24px,3vw,34px);
+  font-weight:900;margin-bottom:10px;letter-spacing:-.3px;
+  background:linear-gradient(135deg,var(--gold-3) 0%,var(--gold) 60%,var(--gold-2) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 10px rgba(124,58,237,.4));
+}
+.hero .titles{color:var(--muted);font-size:clamp(16px,2vw,20px);margin-bottom:28px;line-height:1.9;font-family:'Tajawal','Cairo',sans-serif}
+.hero .titles span{color:var(--text);font-weight:700}
+.hero .titles .lead{display:block;color:#f5f2ea;font-weight:800;font-size:1.1em;margin-bottom:4px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:34px}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:520px}
+.stat{
+  padding:18px;border:1px solid var(--line);border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+}
+.stat b{display:block;font-size:26px;font-weight:900;font-family:'Cairo';
+  background:linear-gradient(135deg,var(--gold-3),var(--gold));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.stat span{color:var(--muted);font-size:13px}
+
+.hero-visual{position:relative;height:520px}
+.avatar-wrap{
+  position:absolute;inset:0;
+  border-radius:32px;overflow:hidden;
+  background:linear-gradient(135deg,#1a1442,#0a0724);
+  border:1px solid var(--line-2);
+  box-shadow:var(--shadow),0 0 60px rgba(124,58,237,.25);
+}
+.avatar-wrap::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 20%,rgba(167,139,250,.28),transparent 60%);
+  pointer-events:none;
+}
+.avatar-placeholder{
+  width:100%;height:100%;display:grid;place-items:center;
+  background:linear-gradient(135deg,#1c1548,#0a0724);
+}
+.avatar-placeholder .initial{
+  font-family:'Cairo';font-size:180px;font-weight:900;
+  background:linear-gradient(180deg,#ffffff 0%,#c9c9d6 55%,#ffffff 80%,#a78bfa 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 8px 20px rgba(167,139,250,.5));
+}
+.floating-card{
+  position:absolute;padding:14px 18px;border-radius:14px;
+  background:rgba(20,15,50,.85);backdrop-filter:blur(10px);
+  border:1px solid var(--line-2);
+  display:flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow);animation:float 4s ease-in-out infinite;
+}
+.floating-card i{color:var(--gold);font-size:18px}
+.floating-card small{color:var(--muted);display:block;font-size:11px}
+.floating-card b{font-size:14px}
+.fc-1{top:22px;right:-24px;animation-delay:0s}
+.fc-2{bottom:32px;left:-20px;animation-delay:1.5s}
+.fc-3{top:45%;left:-40px;animation-delay:.7s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+/* SECTION BASE */
+section{padding:100px 24px;max-width:1280px;margin:0 auto}
+.sec-head{text-align:center;margin-bottom:60px}
+.sec-eyebrow{
+  color:var(--gold);font-size:13px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;
+}
+.sec-title{
+  font-family:'Cairo';font-size:clamp(30px,4vw,46px);font-weight:900;
+  line-height:1.2;margin-bottom:14px;
+}
+.sec-title .grad{
+  background:linear-gradient(135deg,var(--gold-3),var(--gold));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 16px rgba(124,58,237,.35));
+}
+.sec-sub{color:var(--muted);max-width:640px;margin:0 auto;font-size:16px}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.skill-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border:1px solid var(--line);border-radius:var(--radius);padding:26px;
+  transition:.3s;position:relative;overflow:hidden;
+}
+.skill-card::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--gold-soft),transparent 60%);
+  opacity:0;transition:.3s;
+}
+.skill-card:hover{transform:translateY(-6px);border-color:var(--gold)}
+.skill-card:hover::before{opacity:1}
+.skill-card > *{position:relative;z-index:1}
+.skill-logo{
+  width:56px;height:56px;border-radius:14px;
+  background:var(--bg-3);border:1px solid var(--line);
+  display:grid;place-items:center;margin-bottom:16px;font-size:24px;color:var(--gold);
+}
+.skill-card h3{font-size:17px;margin-bottom:6px;font-weight:800}
+.skill-card p{color:var(--muted);font-size:13.5px;line-height:1.7}
+
+/* CLIENTS */
+.clients-wrap{
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:40px 24px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+  overflow:hidden;
+}
+.marquee{display:flex;gap:40px;animation:scroll 30s linear infinite;width:max-content}
+@keyframes scroll{to{transform:translateX(50%)}}
+.client-chip{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 22px;border:1px solid var(--line);border-radius:12px;
+  background:var(--bg-3);color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap;
+  transition:.25s;
+}
+.client-chip:hover{border-color:var(--gold);color:var(--text)}
+.client-chip i{color:var(--gold)}
+
+/* PORTFOLIO */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:22px}
+.project-card{
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.005));
+  transition:.3s;display:flex;flex-direction:column;
+}
+.project-card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 25px 50px -12px rgba(0,0,0,.5)}
+.project-thumb{
+  height:220px;position:relative;
+  background:linear-gradient(135deg,#1a1442 0%,#0a0724 50%,#1c1548 100%);
+  display:grid;place-items:center;overflow:hidden;
+}
+.project-thumb::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(167,139,250,.35),transparent 50%),
+    linear-gradient(45deg,transparent 48%,rgba(167,139,250,.10) 50%,transparent 52%);
+}
+.project-thumb i{font-size:60px;color:var(--gold);position:relative;z-index:1;opacity:.85}
+.project-thumb img{
+  width:100%;height:100%;object-fit:cover;position:relative;z-index:2;
+  transition:transform .5s;
+}
+.project-card:hover .project-thumb img{transform:scale(1.08)}
+.project-thumb .thumb-overlay{
+  position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(180deg,transparent 40%,rgba(7,6,26,.75) 100%);
+}
+.project-body{padding:24px}
+.project-tag{display:inline-block;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+.project-body h3{font-size:20px;margin-bottom:10px;font-weight:800;display:flex;align-items:center;gap:10px}
+.project-body h3 .p-icon{
+  color:var(--gold);font-size:22px;
+  filter:drop-shadow(0 2px 8px rgba(124,58,237,.4));
+}
+.project-body p{color:var(--muted);font-size:14px;margin-bottom:16px;line-height:1.75}
+.project-tech{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.project-tech span{
+  font-size:11px;padding:5px 10px;border-radius:6px;
+  background:rgba(212,169,74,.08);color:var(--gold);border:1px solid rgba(212,169,74,.2);
+}
+.project-link{
+  color:var(--gold);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px;
+  padding:8px 0;transition:.2s;
+}
+.project-link:hover{gap:12px}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:40px}
+.contact-card{
+  padding:28px 22px;border:1px solid var(--line);border-radius:var(--radius);text-align:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);transition:.3s;
+}
+.contact-card:hover{transform:translateY(-6px);border-color:var(--gold);background:var(--gold-soft)}
+.contact-card i{font-size:28px;color:var(--gold);margin-bottom:14px;display:block}
+.contact-card h4{font-size:15px;margin-bottom:6px}
+.contact-card p{color:var(--muted);font-size:13px;word-break:break-all}
+.contact-cta{
+  text-align:center;padding:50px 24px;border-radius:24px;
+  background:linear-gradient(135deg,rgba(212,169,74,.12),rgba(212,169,74,.03));
+  border:1px solid rgba(212,169,74,.28);
+}
+.contact-cta h3{font-family:'Cairo';font-size:clamp(24px,3vw,34px);margin-bottom:12px;font-weight:900}
+.contact-cta p{color:var(--muted);margin-bottom:24px}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--line);margin-top:60px;padding:40px 24px;
+  text-align:center;color:var(--muted);font-size:13px;
+}
+footer .brand{justify-content:center;margin-bottom:14px}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .hero{grid-template-columns:1fr;padding-top:120px}
+  .hero-visual{height:400px;order:-1}
+  .nav-links{display:none}
+  .burger{display:grid;place-items:center}
+  .fc-1,.fc-3{right:-10px;left:auto}
+  .fc-2{left:-10px}
+}
+@media(max-width:520px){
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .stat:last-child{grid-column:1/-1}
+}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s}
+.reveal.on{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-mark" id="brandMark">م</div>
+      <div>
+        <div id="brandName">منى</div>
+        <small id="brandRole">محللة أعمال وذكاء أعمال</small>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#hero">الرئيسية</a>
+      <a href="#skills">المهارات</a>
+      <a href="#clients">الجهات</a>
+      <a href="#portfolio">الأعمال</a>
+      <a href="#contact">تواصل</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" id="cvLink" class="btn btn-ghost" target="_blank"><i class="fa-solid fa-file-arrow-down"></i> السيرة</a>
+      <a href="#contact" class="btn btn-gold"><i class="fa-solid fa-paper-plane"></i> تواصل</a>
+    </div>
+    <button class="burger" onclick="document.querySelector('.nav-links').classList.toggle('open')"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="hero">
+  <div class="reveal">
+    <div class="badge">
+      <span class="dot-live"></span>
+      <span id="availability">متاحة للعمل والمشاريع الجديدة</span>
+    </div>
+    <h1>
+      <span class="line off-white" id="heroTitle">Portfolio</span>
+    </h1>
+    <div class="name-tag" id="heroFullName">منى عارف محمد عسيري</div>
+    <div class="hero-pills" id="heroPills"></div>
+    <div class="titles" id="heroTitles">
+      <span class="lead">محللة بيانات وعمليات أعمال</span>
+      أحوّل البيانات إلى رؤى واضحة، وأنظّم سير العمل لرفع كفاءة الأعمال.
+    </div>
+    <div class="hero-actions">
+      <a href="#" id="certsBtn" class="btn btn-ghost" target="_blank"><i class="fa-solid fa-graduation-cap"></i> شهاداتي</a>
+      <a href="#portfolio" class="btn btn-gold"><i class="fa-solid fa-briefcase"></i> شاهد أعمالي</a>
+      <a href="#contact" class="btn btn-ghost"><i class="fa-solid fa-comments"></i> ابدأ مشروع</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><b id="stat1n">+30</b><span id="stat1l">مشروع منجز</span></div>
+      <div class="stat"><b id="stat2n">+15</b><span id="stat2l">جهة و شريك</span></div>
+      <div class="stat"><b id="stat3n">100%</b><span id="stat3l">التزام بالجودة</span></div>
+    </div>
+  </div>
+  <div class="hero-visual reveal">
+    <div class="avatar-wrap">
+      <div class="avatar-placeholder" id="avatarBox">
+        <span class="initial" id="avatarInitial">م</span>
+      </div>
+    </div>
+    <div class="floating-card fc-1">
+      <i class="fa-solid fa-chart-line"></i>
+      <div><small>تحليل ذكي</small><b>Power BI</b></div>
+    </div>
+    <div class="floating-card fc-2">
+      <i class="fa-solid fa-database"></i>
+      <div><small>نمذجة</small><b>Star Schema</b></div>
+    </div>
+    <div class="floating-card fc-3">
+      <i class="fa-solid fa-robot"></i>
+      <div><small>ذكاء اصطناعي</small><b>AI Integration</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow">Skills</div>
+    <h2 class="sec-title">مهارات <span class="grad">تصنع الفارق</span></h2>
+    <p class="sec-sub">مزيج من تحليل البيانات، والأدوات التقنية، والأتمتة لتطوير العمل بكفاءة ومرونة.</p>
+  </div>
+  <div class="skills-grid" id="skillsGrid"></div>
+</section>
+
+<!-- QUOTE -->
+<section style="padding-top:20px;padding-bottom:20px">
+  <div class="reveal" style="text-align:center;padding:40px 24px;border-radius:24px;background:linear-gradient(135deg,rgba(212,169,74,.08),transparent);border:1px solid var(--line)">
+    <i class="fa-solid fa-quote-right" style="color:var(--gold);font-size:32px;margin-bottom:14px;display:block"></i>
+    <p id="quoteText" style="font-family:'Cairo';font-size:clamp(18px,2.2vw,24px);font-weight:600;line-height:1.7;max-width:820px;margin:0 auto">
+      البيانات وحدها أرقام، لكن التحليل الجيد يحوّلها إلى قرارات تصنع الفرق.
+    </p>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow">Clients</div>
+    <h2 class="sec-title">جهات <span class="grad">وثقت في العمل</span></h2>
+    <p class="sec-sub">شراكات وتعاونات في قطاعات متنوعة.</p>
+  </div>
+  <div class="clients-wrap reveal">
+    <div class="marquee" id="clientsMarquee"></div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow">Portfolio</div>
+    <h2 class="sec-title">أعمال <span class="grad">مختارة بعناية</span></h2>
+    <p class="sec-sub">مشاريع تحليلية متنوعة تُبرز الدقة والفخامة في التصميم.</p>
+  </div>
+  <div class="projects-grid" id="projectsGrid"></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="sec-head reveal">
+    <div class="sec-eyebrow">Contact</div>
+    <h2 class="sec-title">لنبدأ <span class="grad">مشروعك القادم</span></h2>
+    <p class="sec-sub">عندك فكرة أو مشروع؟ اختر طريقة التواصل الأنسب لك، ويسعدني أعرف تفاصيل مشروعك.</p>
+  </div>
+  <div class="contact-grid reveal" id="contactGrid"></div>
+  <div class="reveal" style="text-align:center;margin-top:32px">
+    <a href="#" id="ctaMain" class="btn btn-gold" target="_blank"><i class="fa-solid fa-paper-plane"></i> راسلني الآن</a>
+  </div>
+</section>
+
+<footer>
+  <div class="brand">
+    <div class="brand-mark">م</div>
+    <div><div id="footerName">منى</div><small id="footerRole">محللة أعمال وذكاء أعمال</small></div>
+  </div>
+  <p>© <span id="year"></span> جميع الحقوق محفوظة · صُنع بشغف</p>
+</footer>
+
+<script>
+// ================== DEFAULT DATA ==================
+const DEFAULT_DATA = {
+  brand:{
+    name:"مُنى عارف عسيري",
+    role:"مساعد إداري وتحليل بيانات",
+    initial:"م",
+    availability:"متاحة للعمل والمشاريع الجديدة",
+    fullName:"مُنى عارف محمد عسيري",
+    heroTitle:"Portfolio",
+    pills:["تحليل البيانات","ذكاء الأعمال","أتمتة العمليات"],
+    certsLink:"https://drive.google.com/drive/folders/1aK9SlsDYwufY-z3qV5IIciRE8yG5Prm9?usp=drive_link",
+    greeting:"DATA",
+    label:"ANALYST",
+    line3:"",
+    titles:'<span class="lead">مساعد إداري وتحليل بيانات</span>أحوّل البيانات إلى رؤى استراتيجية تساعد على اتخاذ قرارات أكثر ذكاء. خريجة بكالوريوس إدارة أعمال، وأوظّف تحليل البيانات وتصميم لوحات المعلومات التفاعلية ودمج تقنيات الذكاء الاصطناعي لتحسين الأداء ورفع كفاءة الأعمال وصناعة قيمة حقيقية للمؤسسات.',
+    cv:"https://drive.google.com/file/d/1mgL-3OyRM5wq6g47LXH8ZGLPlVVy5sfi/view?usp=sharing",
+    quote:"البيانات وحدها أرقام، لكن التحليل الجيد يحوّلها إلى قرارات تصنع الفرق.",
+    ctaLink:"mailto:mona.1424000@gmail.com",
+    avatarUrl:"https://drive.google.com/thumbnail?id=1wK8XP0JcX0B_Y_5mf2uAX9QLKqj2i6JD&sz=w1200"
+  },
+  stats:[
+    {n:"+30",l:"مشروع منجز"},
+    {n:"+15",l:"جهة و شريك"},
+    {n:"100%",l:"التزام بالجودة"}
+  ],
+  skills:[
+    {icon:"fa-solid fa-chart-column",title:"Power BI",desc:"لوحات معلومات ذكية وتفاعلية بأسلوب فاخر"},
+    {icon:"fa-solid fa-database",title:"SQL",desc:"استعلامات متقدمة وتحسين الأداء"},
+    {icon:"fa-solid fa-file-excel",title:"Excel",desc:"نمذجة، Pivot، Power Query، وأتمتة كاملة"},
+    {icon:"fa-solid fa-brain",title:"Business Intelligence",desc:"تحويل البيانات إلى قرارات استراتيجية"},
+    {icon:"fa-solid fa-diagram-project",title:"Workflow Automation",desc:"تبسيط وأتمتة سير العمل والمهام المتكررة"},
+    {icon:"fa-solid fa-chart-pie",title:"Data Visualization",desc:"تصاميم مرئية تحكي القصة بوضوح"}
+  ],
+  clients:[
+    {name:"مستوصفات سمايا",icon:"fa-solid fa-hospital"},
+    {name:"معرض السيارات",icon:"fa-solid fa-car"},
+    {name:"مكتب ملاك الهويشل للمحاماة",icon:"fa-solid fa-scale-balanced"},
+    {name:"مشروع السياحة",icon:"fa-solid fa-plane"},
+    {name:"جهات حكومية",icon:"fa-solid fa-building-columns"},
+    {name:"شركات ناشئة",icon:"fa-solid fa-rocket"}
+  ],
+  projects:[
+    {icon:"fa-solid fa-cart-shopping",tag:"Online Stores",title:"لماذا لا تتحول المبيعات إلى ربح؟",desc:"تحليل تنفيذي يوضح لماذا لا تتحول المبيعات المرتفعة إلى ربح، ويكشف محركات الربحية ومواطن تسريبها",tech:["Power BI","DAX","Star Schema"],link:"https://app.powerbi.com/view?r=eyJrIjoiNWE1YTQ4NzktYmI0MC00MDkzLWExZDItNzBmMGQ4MTA2ZjZjIiwidCI6IjNlMDNiMmEzLWNkM2EtNDZmNy1iMDUxLTc2YjQzMzQ0Zjk5MyIsImMiOjl9&pageName=7fc324bcb790bcee000d",img:"https://drive.google.com/file/d/1mxcy8u_C0W96WDZf6o_DIgfX_Ms0Qt1j/view?usp=sharing"},
+    {icon:"fa-solid fa-car",tag:"Automotive Dealerships",title:"تحليل أداء وربحية معرض سيارات",desc:"تحليل بيانات المبيعات والعملاء ورحلة الشراء لاكتشاف فرص النمو وتحسين الربحية ودعم القرارات التجارية.",tech:["SQL","Power BI","Excel"],link:"https://dashing-medovik-ddf076.netlify.app/",img:"https://drive.google.com/file/d/1SY3X7sndaXhtvmK_FCPr_RpX5Wr4geV_/view?usp=sharing"},
+    {icon:"fa-solid fa-mug-hot",tag:"Coffee Shop",title:"لوحة تحليلات كوفي كيو",desc:"لوحة معلومات تفاعلية لتحليل مبيعات وأرباح ومصروفات مقهى KEO، مع متابعة أداء الموظفين والمنتجات الأكثر مبيعًا، ودعم الإدارة في مراقبة الأداء واتخاذ قرارات مبنية على البيانات.",tech:["Power BI","Python","DAX"],link:"https://app.powerbi.com/view?r=eyJrIjoiYjBlOTY3YmQtYWUxYi00MGRjLWFkY2YtYmIyYmNlNzYyZTRlIiwidCI6IjNlMDNiMmEzLWNkM2EtNDZmNy1iMDUxLTc2YjQzMzQ0Zjk5MyIsImMiOjl9",img:"https://drive.google.com/file/d/15m0wTaqbt4Oju5I3VAEHCD-4b3KCpfjh/view?usp=sharing"},
+    {icon:"fa-solid fa-heart-pulse",tag:"Clinics",title:"تحليل رحلة المريض وأداء الإيرادات",desc:"تحليل رحلة المريض ومؤشرات التحويل والإيرادات باستخدام Power BI، مع تحديد مصادر تسرب الإيرادات وفرص تحسين الأداء التشغيلي والمالي.",tech:["Power BI","DAX","Power Query","Excel"],link:"https://app.powerbi.com/groups/me/reports/ea9130a6-673e-4eae-bc57-f9f0969baa29/d32b727089ab07b21b20?experience=power-bi&bookmarkGuid=658581e60ecdd64c0ab7",img:"https://drive.google.com/file/d/1db-MzuHu_rTXawtE0PGpYvhwizjEE8jQ/view?usp=sharing"},
+    {icon:"fa-solid fa-graduation-cap",tag:"Training Center",title:"تحليل الأداء التشغيلي والمالي لمركز التدريب",desc:"لوحة Power BI تفاعلية لتحليل: الإيرادات، الربحية، التسجيلات، وأداء المجالات والمدربين، بهدف متابعة الأداء واكتشاف فرص التحسين ودعم اتخاذ القرار.",tech:["Power BI","DAX","Power Query"],link:"https://app.powerbi.com/view?r=eyJrIjoiMzRjNmNlOGUtYTM3OC00ZmU2LWFmNjEtMDY5NDg5M2JkYWIyIiwidCI6IjNlMDNiMmEzLWNkM2EtNDZmNy1iMDUxLTc2YjQzMzQ0Zjk5MyIsImMiOjl9",img:"https://drive.google.com/file/d/1B7oZgPMxkAqdg8frki1fvQxq5goyzmRE/view?usp=sharing"}
+  ],
+  contacts:[
+    {icon:"fa-brands fa-whatsapp",title:"واتساب",value:"+966 53 346 9023",link:"https://wa.me/966533469023"},
+    {icon:"fa-solid fa-envelope",title:"البريد الإلكتروني",value:"mona.1424000@gmail.com",link:"mailto:mona.1424000@gmail.com"},
+    {icon:"fa-brands fa-linkedin",title:"LinkedIn",value:"منى محمد",link:"https://www.linkedin.com/in/منى-محمد-82883b210"}
+  ]
+};
+
+// ================== IMAGE URL NORMALIZER ==================
+// Converts Google Drive share links (and similar) to direct image URLs
+function normalizeImg(url){
+  if(!url) return '';
+  url = String(url).trim();
+  // Google Drive: /file/d/ID/view  OR  ?id=ID  OR  /d/ID
+  let m = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=[^&]+&)?id=|thumbnail\?id=)|\/d\/)([a-zA-Z0-9_-]{20,})/);
+  if(m) return `https://lh3.googleusercontent.com/d/${m[1]}=w2000`;
+  return url;
+}
+
+// ================== LOAD DATA ==================
+function loadData(){
+  try{
+    const stored = localStorage.getItem('monaPortfolioData');
+    if(stored){
+      const d = JSON.parse(stored);
+      // Auto-migration: update old default description to the new one
+      if(d.brand && d.brand.titles && d.brand.titles.includes('محللة أعمال') && d.brand.titles.includes('ذكاء أعمال')){
+        d.brand.titles = '<span class="lead">محللة بيانات وعمليات أعمال</span>أحوّل البيانات إلى رؤى واضحة، وأنظّم سير العمل لرفع كفاءة الأعمال.';
+        try{ localStorage.setItem('monaPortfolioData', JSON.stringify(d)); }catch(e){}
+      }
+      return d;
+    }
+  }catch(e){}
+  return DEFAULT_DATA;
+}
+
+const data = loadData();
+
+// ================== RENDER ==================
+function render(){
+  // Brand
+  document.getElementById('brandName').textContent = data.brand.name;
+  document.getElementById('brandRole').textContent = data.brand.role;
+  document.getElementById('brandMark').textContent = data.brand.initial;
+  document.getElementById('footerName').textContent = data.brand.name;
+  document.getElementById('footerRole').textContent = data.brand.role;
+  document.getElementById('avatarInitial').textContent = data.brand.initial;
+  document.getElementById('heroTitle').textContent = data.brand.heroTitle || 'Portfolio';
+  document.getElementById('heroFullName').textContent = data.brand.fullName || data.brand.name || 'منى';
+
+  // Pills
+  const pills = (data.brand.pills && data.brand.pills.length) ? data.brand.pills : ['تحليل البيانات','ذكاء الأعمال','أتمتة العمليات'];
+  document.getElementById('heroPills').innerHTML = pills.filter(p=>p && p.trim()).map(p=>`<span class="pill">${p}</span>`).join('');
+
+  // Certs button — always visible; link updates when set in control panel
+  document.getElementById('certsBtn').href = (data.brand.certsLink && data.brand.certsLink.trim()) ? data.brand.certsLink : '#';
+  document.getElementById('heroTitles').innerHTML = data.brand.titles;
+  document.getElementById('availability').textContent = data.brand.availability;
+  document.getElementById('quoteText').textContent = data.brand.quote;
+  document.getElementById('cvLink').href = data.brand.cv || '#';
+  document.getElementById('ctaMain').href = data.brand.ctaLink || '#';
+  document.title = data.brand.name + ' | ' + data.brand.role;
+
+  if(data.brand.avatarUrl){
+    document.getElementById('avatarBox').innerHTML = `<img src="${normalizeImg(data.brand.avatarUrl)}" alt="${data.brand.name}" style="width:100%;height:100%;object-fit:cover" referrerpolicy="no-referrer"/>`;
+  }
+
+  // Stats
+  const st = data.stats || [];
+  ['stat1','stat2','stat3'].forEach((k,i)=>{
+    if(st[i]){
+      document.getElementById(k+'n').textContent = st[i].n;
+      document.getElementById(k+'l').textContent = st[i].l;
+    }
+  });
+
+  // Skills
+  document.getElementById('skillsGrid').innerHTML = data.skills.map(s=>`
+    <div class="skill-card">
+      <div class="skill-logo"><i class="${s.icon}"></i></div>
+      <h3>${s.title}</h3>
+      <p>${s.desc}</p>
+    </div>
+  `).join('');
+
+  // Clients (duplicate for smooth scroll)
+  const clientsHtml = data.clients.map(c=>`
+    <div class="client-chip"><i class="${c.icon}"></i>${c.name}</div>
+  `).join('');
+  document.getElementById('clientsMarquee').innerHTML = clientsHtml + clientsHtml;
+
+  // Projects
+  document.getElementById('projectsGrid').innerHTML = data.projects.map(p=>`
+    <div class="project-card">
+      <div class="project-thumb">
+        ${p.img ? `<img src="${normalizeImg(p.img)}" alt="${p.title}" onerror="this.style.display='none'" referrerpolicy="no-referrer"/><div class="thumb-overlay"></div>` : `<i class="fa-solid fa-chart-column"></i>`}
+      </div>
+      <div class="project-body">
+        <div class="project-tag">${p.tag}</div>
+        <h3>${p.icon ? `<i class="${p.icon} p-icon"></i>` : ''}${p.title}</h3>
+        <p>${p.desc}</p>
+        <div class="project-tech">${(p.tech||[]).map(t=>`<span>${t}</span>`).join('')}</div>
+        <a href="${p.link}" class="project-link" target="_blank">عرض المشروع <i class="fa-solid fa-arrow-left"></i></a>
+      </div>
+    </div>
+  `).join('');
+
+  // Contacts
+  document.getElementById('contactGrid').innerHTML = data.contacts.map(c=>`
+    <a href="${c.link}" target="_blank" class="contact-card">
+      <i class="${c.icon}"></i>
+      <h4>${c.title}</h4>
+      <p>${c.value}</p>
+    </a>
+  `).join('');
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+}
+
+render();
+
+// Reveal on scroll
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); }
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Live sync when control panel updates
+window.addEventListener('storage', (e)=>{
+  if(e.key==='monaPortfolioData'){ location.reload(); }
+});
+</script>
+</body>
+</html>

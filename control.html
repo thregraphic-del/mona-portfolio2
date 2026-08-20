@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة تحكم منى | إدارة الموقع</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Cairo:wght@600;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+:root{
+  --bg:#07061a;--bg-2:#0d0a24;--bg-3:#14102e;--bg-4:#1c1748;
+  --line:rgba(167,139,250,.10);--line-2:rgba(167,139,250,.22);
+  --text:#f5f5f5;--muted:#b0acc9;--muted-2:#7a7695;
+  --gold:#a78bfa;--gold-2:#7c3aed;--gold-3:#c4b5fd;
+  --gold-soft:rgba(167,139,250,.15);
+  --success:#4ade80;--danger:#f87171;--warn:#fbbf24;
+  --r:14px;--r-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Tajawal','Cairo',sans-serif;line-height:1.7;overflow-x:hidden}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1000px 500px at 85% -10%,rgba(139,92,246,.12),transparent 60%),
+    radial-gradient(800px 400px at 10% 100%,rgba(124,58,237,.10),transparent 60%);
+}
+button,input,textarea,select{font-family:inherit}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh;position:relative;z-index:1}
+.sidebar{
+  background:linear-gradient(180deg,#0a0824,#050414);
+  border-left:1px solid var(--line);padding:24px 16px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sb-brand{display:flex;align-items:center;gap:12px;padding:0 8px 24px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.sb-brand .mark{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--gold-3),var(--gold-2));
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;
+  box-shadow:0 8px 20px rgba(124,58,237,.5);
+}
+.sb-brand b{font-family:'Cairo';font-size:16px;font-weight:800;display:block}
+.sb-brand small{color:var(--muted);font-size:12px}
+.sb-nav{display:flex;flex-direction:column;gap:4px}
+.sb-nav button{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;
+  background:none;border:1px solid transparent;color:var(--muted);
+  font-weight:600;font-size:14px;cursor:pointer;transition:.2s;text-align:right;
+}
+.sb-nav button i{width:18px;text-align:center;color:var(--muted-2)}
+.sb-nav button:hover{background:rgba(255,255,255,.03);color:var(--text)}
+.sb-nav button.active{
+  background:var(--gold-soft);color:var(--gold);border-color:rgba(212,169,74,.3);
+}
+.sb-nav button.active i{color:var(--gold)}
+.sb-foot{margin-top:auto;padding-top:20px}
+.sb-hint{
+  padding:12px;background:rgba(212,169,74,.06);border:1px dashed rgba(212,169,74,.25);
+  border-radius:10px;font-size:12px;color:var(--muted);line-height:1.7;
+}
+.sb-hint b{color:var(--gold);display:block;margin-bottom:4px}
+
+/* MAIN */
+.main{padding:24px 32px 60px;max-width:1200px}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 24px;background:var(--bg-3);border:1px solid var(--line);
+  border-radius:var(--r);margin-bottom:24px;flex-wrap:wrap;gap:16px;
+}
+.topbar h1{font-family:'Cairo';font-size:22px;font-weight:800}
+.topbar h1 span{color:var(--gold)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:10px;font-weight:700;font-size:13.5px;
+  border:1px solid transparent;cursor:pointer;transition:.2s;
+}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;box-shadow:0 8px 20px rgba(124,58,237,.4)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(124,58,237,.55)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:rgba(248,113,113,.1);color:var(--danger);border-color:rgba(248,113,113,.3)}
+.btn-danger:hover{background:rgba(248,113,113,.2)}
+.btn-small{padding:6px 12px;font-size:12px}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(30px);
+  padding:14px 24px;background:var(--bg-4);border:1px solid var(--line-2);
+  border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,.4);
+  display:flex;align-items:center;gap:10px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.35s;z-index:1000;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+
+/* PANELS */
+.panel{display:none;animation:fade .3s}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{
+  background:var(--bg-3);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px;margin-bottom:20px;
+}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.card-head h2{font-family:'Cairo';font-size:18px;font-weight:800}
+.card-head h2 i{color:var(--gold);margin-left:8px}
+
+/* FORMS */
+.field{margin-bottom:16px}
+.field label{display:block;margin-bottom:8px;font-size:13px;color:var(--muted);font-weight:600}
+.field label .req{color:var(--gold)}
+.field input,.field textarea,.field select{
+  width:100%;padding:12px 14px;background:var(--bg);color:var(--text);
+  border:1px solid var(--line-2);border-radius:var(--r-sm);
+  font-size:14px;transition:.2s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:none;border-color:var(--gold);background:var(--bg-2);
+}
+.field textarea{resize:vertical;min-height:80px;line-height:1.7}
+.field small{color:var(--muted-2);font-size:12px;margin-top:6px;display:block}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* LIST ITEMS */
+.item{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:16px;margin-bottom:12px;position:relative;
+}
+.item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.item-title{font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.item-actions{display:flex;gap:6px}
+.icon-btn{
+  width:32px;height:32px;border-radius:8px;background:transparent;border:1px solid var(--line);
+  color:var(--muted);cursor:pointer;transition:.2s;display:grid;place-items:center;
+}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
+.icon-btn.del:hover{border-color:var(--danger);color:var(--danger)}
+
+/* BADGES for qualifications */
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.badge-tag{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 14px;
+  background:var(--gold-soft);color:var(--gold);border:1px solid rgba(212,169,74,.25);
+  border-radius:999px;font-weight:600;font-size:13px;
+}
+.badge-tag button{
+  background:none;border:none;color:var(--gold);cursor:pointer;font-size:14px;
+  opacity:.7;transition:.2s;padding:0;
+}
+.badge-tag button:hover{opacity:1}
+
+/* PREVIEW */
+.preview-mini{
+  background:var(--bg);padding:20px;border-radius:var(--r-sm);border:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;
+}
+.preview-mini .av{
+  width:60px;height:60px;border-radius:14px;
+  background:linear-gradient(135deg,var(--gold-3),var(--gold-2));
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:24px;
+  box-shadow:0 6px 18px rgba(124,58,237,.4);
+}
+.preview-mini b{display:block;font-size:16px}
+.preview-mini small{color:var(--muted);font-size:12px}
+
+/* CONFIRM MODAL */
+.modal-back{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;z-index:900;padding:20px;
+}
+.modal-back.show{display:flex}
+.modal{
+  background:var(--bg-3);border:1px solid var(--line-2);border-radius:var(--r);
+  padding:28px;max-width:420px;width:100%;text-align:center;
+}
+.modal h3{margin-bottom:10px;font-family:'Cairo'}
+.modal p{color:var(--muted);margin-bottom:20px}
+.modal .actions{justify-content:center}
+
+/* SAVE BAR */
+.savebar{
+  position:sticky;bottom:20px;margin-top:24px;
+  padding:14px 20px;background:linear-gradient(135deg,rgba(212,169,74,.15),rgba(212,169,74,.05));
+  border:1px solid rgba(212,169,74,.3);border-radius:var(--r);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  backdrop-filter:blur(10px);z-index:100;
+}
+.savebar .info{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--gold)}
+.savebar .info i{font-size:18px}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto}
+  .sb-nav{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .sb-nav button{flex:1;min-width:140px}
+  .sb-foot{display:none}
+  .main{padding:20px 16px 80px}
+  .row,.row-3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="mark">م</div>
+      <div>
+        <b>لوحة التحكم</b>
+        <small>موقع منى الشخصي</small>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <button class="active" data-tab="profile"><i class="fa-solid fa-user"></i> الملف الشخصي</button>
+      <button data-tab="stats"><i class="fa-solid fa-chart-simple"></i> الأرقام والإحصائيات</button>
+      <button data-tab="skills"><i class="fa-solid fa-lightbulb"></i> المهارات</button>
+      <button data-tab="clients"><i class="fa-solid fa-building"></i> الجهات</button>
+      <button data-tab="projects"><i class="fa-solid fa-briefcase"></i> الأعمال</button>
+      <button data-tab="contact"><i class="fa-solid fa-address-book"></i> طرق التواصل</button>
+      <button data-tab="data"><i class="fa-solid fa-database"></i> النسخ والاستيراد</button>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-hint">
+        <b><i class="fa-solid fa-lightbulb"></i> ملاحظة</b>
+        كل تعديل يُحفظ محلياً في متصفحك ويظهر مباشرة على الموقع عند فتحه من نفس الجهاز.
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <h1><i class="fa-solid fa-sliders" style="color:var(--gold)"></i> إدارة <span>محتوى الموقع</span></h1>
+      <div class="actions">
+        <a href="index.html" target="_blank" class="btn btn-ghost"><i class="fa-solid fa-eye"></i> فتح الموقع</a>
+        <button class="btn btn-gold" onclick="saveAll()"><i class="fa-solid fa-check"></i> حفظ كل التعديلات</button>
+      </div>
+    </div>
+
+    <!-- PROFILE PANEL -->
+    <div class="panel active" data-panel="profile">
+      <div class="card">
+        <div class="card-head"><h2><i class="fa-solid fa-user"></i> البيانات الأساسية</h2></div>
+        <div class="preview-mini" style="margin-bottom:20px">
+          <div class="av" id="prevInit">م</div>
+          <div>
+            <b id="prevName">منى</b>
+            <small id="prevRole">محللة أعمال وذكاء أعمال</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>الاسم <span class="req">*</span></label>
+            <input type="text" data-bind="brand.name" oninput="updatePreview()" />
+          </div>
+          <div class="field">
+            <label>الحرف الأول للشعار</label>
+            <input type="text" data-bind="brand.initial" maxlength="2" oninput="updatePreview()" />
+          </div>
+        </div>
+        <div class="field">
+          <label>المسمى الوظيفي</label>
+          <input type="text" data-bind="brand.role" oninput="updatePreview()" />
+        </div>
+        <div class="field">
+          <label>الاسم الكامل (يظهر تحت العنوان الكبير)</label>
+          <input type="text" data-bind="brand.fullName" />
+          <small>مثال: منى عارف محمد عسيري</small>
+        </div>
+        <div class="field">
+          <label>العنوان الإنجليزي الكبير</label>
+          <input type="text" data-bind="brand.heroTitle" />
+          <small>افتراضي: Portfolio</small>
+        </div>
+        <div class="row-3">
+          <div class="field">
+            <label>الشارة ١ (تحت الاسم)</label>
+            <input type="text" data-bind="brand.pill1" placeholder="تحليل البيانات" />
+          </div>
+          <div class="field">
+            <label>الشارة ٢</label>
+            <input type="text" data-bind="brand.pill2" placeholder="ذكاء الأعمال" />
+          </div>
+          <div class="field">
+            <label>الشارة ٣</label>
+            <input type="text" data-bind="brand.pill3" placeholder="أتمتة العمليات" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>🎓 رابط ملف الشهادات (Google Drive أو مجلد)</label>
+            <input type="url" data-bind="brand.certsLink" placeholder="https://drive.google.com/..." />
+            <small>لما تحط رابط هنا، يظهر زر "شهاداتي" في الهيرو. اتركه فارغ لإخفائه.</small>
+          </div>
+          <div class="field">
+            <label>حالة التوفر</label>
+            <input type="text" data-bind="brand.availability" />
+          </div>
+        </div>
+        <div class="field">
+          <label>الوصف الرئيسي (يقبل HTML)</label>
+          <textarea data-bind="brand.titles" rows="4"></textarea>
+          <small>يمكنك استخدام &lt;span&gt; و &lt;br&gt; للتنسيق</small>
+        </div>
+        <div class="field">
+          <label>الاقتباس / العبارة المميزة</label>
+          <textarea data-bind="brand.quote" rows="2"></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>رابط السيرة الذاتية (Google Drive أو PDF)</label>
+            <input type="url" data-bind="brand.cv" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label>رابط زر التواصل الرئيسي</label>
+            <input type="url" data-bind="brand.ctaLink" placeholder="mailto:... أو https://wa.me/..." />
+          </div>
+        </div>
+        <div class="field">
+          <label>رابط الصورة الشخصية (اختياري)</label>
+          <input type="url" data-bind="brand.avatarUrl" placeholder="اتركيه فارغ لعرض الحرف الأول" />
+          <small>إذا تُرك فارغاً، سيظهر الحرف الأول بتدرج فضي كرومي فاخر</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS PANEL -->
+    <div class="panel" data-panel="stats">
+      <div class="card">
+        <div class="card-head"><h2><i class="fa-solid fa-chart-simple"></i> الأرقام والإحصائيات</h2></div>
+        <p style="color:var(--muted);margin-bottom:16px">ثلاثة أرقام تظهر في القسم العلوي من الموقع.</p>
+        <div id="statsList"></div>
+      </div>
+    </div>
+
+    <!-- SKILLS PANEL -->
+    <div class="panel" data-panel="skills">
+      <div class="card">
+        <div class="card-head">
+          <h2><i class="fa-solid fa-lightbulb"></i> المهارات</h2>
+          <button class="btn btn-gold btn-small" onclick="addItem('skills',{icon:'fa-solid fa-star',title:'مهارة جديدة',desc:'وصف مختصر'})"><i class="fa-solid fa-plus"></i> إضافة مهارة</button>
+        </div>
+        <div id="skillsList"></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS PANEL -->
+    <div class="panel" data-panel="clients">
+      <div class="card">
+        <div class="card-head">
+          <h2><i class="fa-solid fa-building"></i> الجهات والعملاء</h2>
+          <button class="btn btn-gold btn-small" onclick="addItem('clients',{name:'جهة جديدة',icon:'fa-solid fa-building'})"><i class="fa-solid fa-plus"></i> إضافة جهة</button>
+        </div>
+        <div id="clientsList"></div>
+      </div>
+    </div>
+
+    <!-- PROJECTS PANEL -->
+    <div class="panel" data-panel="projects">
+      <div class="card">
+        <div class="card-head">
+          <h2><i class="fa-solid fa-briefcase"></i> الأعمال والمشاريع</h2>
+          <button class="btn btn-gold btn-small" onclick="addItem('projects',{icon:'fa-solid fa-chart-column',tag:'Category',title:'مشروع جديد',desc:'وصف المشروع',tech:['Tool'],link:'#',img:''})"><i class="fa-solid fa-plus"></i> إضافة مشروع</button>
+        </div>
+        <div id="projectsList"></div>
+      </div>
+    </div>
+
+    <!-- CONTACT PANEL -->
+    <div class="panel" data-panel="contact">
+      <div class="card">
+        <div class="card-head">
+          <h2><i class="fa-solid fa-address-book"></i> طرق التواصل</h2>
+          <button class="btn btn-gold btn-small" onclick="addItem('contacts',{icon:'fa-solid fa-envelope',title:'قناة جديدة',value:'',link:'#'})"><i class="fa-solid fa-plus"></i> إضافة قناة</button>
+        </div>
+        <div id="contactsList"></div>
+      </div>
+    </div>
+
+    <!-- DATA PANEL -->
+    <div class="panel" data-panel="data">
+      <div class="card">
+        <div class="card-head"><h2><i class="fa-solid fa-database"></i> النسخ الاحتياطي والاستيراد</h2></div>
+        <p style="color:var(--muted);margin-bottom:20px">يمكنك تصدير كل بيانات الموقع كملف Excel أو JSON، وإعادة استيرادها لاحقاً.</p>
+
+        <div class="row" style="margin-bottom:12px">
+          <button class="btn btn-gold" onclick="exportExcel()"><i class="fa-solid fa-file-excel"></i> تصدير Excel</button>
+          <button class="btn btn-ghost" onclick="exportJSON()"><i class="fa-solid fa-file-code"></i> تصدير JSON</button>
+        </div>
+        <div class="row" style="margin-bottom:20px">
+          <label class="btn btn-ghost" style="cursor:pointer">
+            <i class="fa-solid fa-file-import"></i> استيراد Excel
+            <input type="file" accept=".xlsx,.xls" onchange="importExcel(this)" hidden />
+          </label>
+          <label class="btn btn-ghost" style="cursor:pointer">
+            <i class="fa-solid fa-file-import"></i> استيراد JSON
+            <input type="file" accept=".json" onchange="importJSON(this)" hidden />
+          </label>
+        </div>
+
+        <div style="padding-top:20px;border-top:1px solid var(--line)">
+          <h3 style="margin-bottom:12px;font-family:'Cairo';color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i> إعادة الضبط</h3>
+          <p style="color:var(--muted);margin-bottom:14px">إرجاع كل الإعدادات للقيم الافتراضية. لا يمكن التراجع.</p>
+          <button class="btn btn-danger" onclick="confirmReset()"><i class="fa-solid fa-rotate-left"></i> استعادة الإعدادات الافتراضية</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVE BAR -->
+    <div class="savebar">
+      <div class="info"><i class="fa-solid fa-circle-info"></i> عند الانتهاء اضغط "حفظ كل التعديلات" لتفعيل التغييرات على الموقع.</div>
+      <button class="btn btn-gold" onclick="saveAll()"><i class="fa-solid fa-check"></i> حفظ كل التعديلات</button>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fa-solid fa-check"></i> <span id="toastMsg">تم الحفظ</span></div>
+
+<!-- MODAL -->
+<div class="modal-back" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle">تأكيد</h3>
+    <p id="modalBody">هل أنت متأكد؟</p>
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-danger" id="modalOk">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================== DEFAULT DATA (same as index) ==================
+const DEFAULT_DATA = {
+  brand:{
+    name:"مُنى عارف عسيري",role:"مساعد إداري وتحليل بيانات",initial:"م",
+    availability:"متاحة للعمل والمشاريع الجديدة",
+    fullName:"مُنى عارف محمد عسيري",
+    heroTitle:"Portfolio",
+    pills:["تحليل البيانات","ذكاء الأعمال","أتمتة العمليات"],
+    certsLink:"https://drive.google.com/drive/folders/1aK9SlsDYwufY-z3qV5IIciRE8yG5Prm9?usp=drive_link",
+    greeting:"DATA",
+    label:"ANALYST",
+    line3:"",
+    titles:'<span class="lead">مساعد إداري وتحليل بيانات</span>أحوّل البيانات إلى رؤى استراتيجية تساعد على اتخاذ قرارات أكثر ذكاء. خريجة بكالوريوس إدارة أعمال، وأوظّف تحليل البيانات وتصميم لوحات المعلومات التفاعلية ودمج تقنيات الذكاء الاصطناعي لتحسين الأداء ورفع كفاءة الأعمال وصناعة قيمة حقيقية للمؤسسات.',
+    cv:"https://drive.google.com/file/d/1mgL-3OyRM5wq6g47LXH8ZGLPlVVy5sfi/view?usp=sharing",
+    quote:"البيانات وحدها أرقام، لكن التحليل الجيد يحوّلها إلى قرارات تصنع الفرق.",
+    ctaLink:"mailto:mona.1424000@gmail.com",
+    avatarUrl:"https://drive.google.com/thumbnail?id=1wK8XP0JcX0B_Y_5mf2uAX9QLKqj2i6JD&sz=w1200"
+  },
+  stats:[
+    {n:"+30",l:"مشروع منجز"},
+    {n:"+15",l:"جهة و شريك"},
+    {n:"100%",l:"التزام بالجودة"}
+  ],
+  skills:[
+    {icon:"fa-solid fa-chart-column",title:"Power BI",desc:"لوحات معلومات ذكية وتفاعلية بأسلوب فاخر"},
+    {icon:"fa-solid fa-database",title:"SQL",desc:"استعلامات متقدمة وتحسين الأداء"},
+    {icon:"fa-solid fa-file-excel",title:"Excel",desc:"نمذجة، Pivot، Power Query، وأتمتة كاملة"},
+    {icon:"fa-solid fa-brain",title:"Business Intelligence",desc:"تحويل البيانات إلى قرارات استراتيجية"},
+    {icon:"fa-solid fa-diagram-project",title:"Workflow Automation",desc:"تبسيط وأتمتة سير العمل والمهام المتكررة"},
+    {icon:"fa-solid fa-chart-pie",title:"Data Visualization",desc:"تصاميم مرئية تحكي القصة بوضوح"}
+  ],
+  clients:[
+    {name:"مستوصفات سمايا",icon:"fa-solid fa-hospital"},
+    {name:"معرض السيارات",icon:"fa-solid fa-car"},
+    {name:"مكتب ملاك الهويشل للمحاماة",icon:"fa-solid fa-scale-balanced"},
+    {name:"مشروع السياحة",icon:"fa-solid fa-plane"},
+    {name:"جهات حكومية",icon:"fa-solid fa-building-columns"},
+    {name:"شركات ناشئة",icon:"fa-solid fa-rocket"}
+  ],
+  projects:[
+    {icon:"fa-solid fa-cart-shopping",tag:"Online Stores",title:"لماذا لا تتحول المبيعات إلى ربح؟",desc:"تحليل تنفيذي يوضح لماذا لا تتحول المبيعات المرتفعة إلى ربح، ويكشف محركات الربحية ومواطن تسريبها",tech:["Power BI","DAX","Star Schema"],link:"https://app.powerbi.com/view?r=eyJrIjoiNWE1YTQ4NzktYmI0MC00MDkzLWExZDItNzBmMGQ4MTA2ZjZjIiwidCI6IjNlMDNiMmEzLWNkM2EtNDZmNy1iMDUxLTc2YjQzMzQ0Zjk5MyIsImMiOjl9&pageName=7fc324bcb790bcee000d",img:"https://drive.google.com/file/d/1mxcy8u_C0W96WDZf6o_DIgfX_Ms0Qt1j/view?usp=sharing"},
+    {icon:"fa-solid fa-car",tag:"Automotive Dealerships",title:"تحليل أداء وربحية معرض سيارات",desc:"تحليل بيانات المبيعات والعملاء ورحلة الشراء لاكتشاف فرص النمو وتحسين الربحية ودعم القرارات التجارية.",tech:["SQL","Power BI","Excel"],link:"https://dashing-medovik-ddf076.netlify.app/",img:"https://drive.google.com/file/d/1SY3X7sndaXhtvmK_FCPr_RpX5Wr4geV_/view?usp=sharing"},
+    {icon:"fa-solid fa-mug-hot",tag:"Coffee Shop",title:"لوحة تحليلات كوفي كيو",desc:"لوحة معلومات تفاعلية لتحليل مبيعات وأرباح ومصروفات مقهى KEO، مع متابعة أداء الموظفين والمنتجات الأكثر مبيعًا، ودعم الإدارة في مراقبة الأداء واتخاذ قرارات مبنية على البيانات.",tech:["Power BI","Python","DAX"],link:"https://app.powerbi.com/view?r=eyJrIjoiYjBlOTY3YmQtYWUxYi00MGRjLWFkY2YtYmIyYmNlNzYyZTRlIiwidCI6IjNlMDNiMmEzLWNkM2EtNDZmNy1iMDUxLTc2YjQzMzQ0Zjk5MyIsImMiOjl9",img:"https://drive.google.com/file/d/15m0wTaqbt4Oju5I3VAEHCD-4b3KCpfjh/view?usp=sharing"},
+    {icon:"fa-solid fa-heart-pulse",tag:"Clinics",title:"تحليل رحلة المريض وأداء الإيرادات",desc:"تحليل رحلة المريض ومؤشرات التحويل والإيرادات باستخدام Power BI، مع تحديد مصادر تسرب الإيرادات وفرص تحسين الأداء التشغيلي والمالي.",tech:["Power BI","DAX","Power Query","Excel"],link:"https://app.powerbi.com/groups/me/reports/ea9130a6-673e-4eae-bc57-f9f0969baa29/d32b727089ab07b21b20?experience=power-bi&bookmarkGuid=658581e60ecdd64c0ab7",img:"https://drive.google.com/file/d/1db-MzuHu_rTXawtE0PGpYvhwizjEE8jQ/view?usp=sharing"},
+    {icon:"fa-solid fa-graduation-cap",tag:"Training Center",title:"تحليل الأداء التشغيلي والمالي لمركز التدريب",desc:"لوحة Power BI تفاعلية لتحليل: الإيرادات، الربحية، التسجيلات، وأداء المجالات والمدربين، بهدف متابعة الأداء واكتشاف فرص التحسين ودعم اتخاذ القرار.",tech:["Power BI","DAX","Power Query"],link:"https://app.powerbi.com/view?r=eyJrIjoiMzRjNmNlOGUtYTM3OC00ZmU2LWFmNjEtMDY5NDg5M2JkYWIyIiwidCI6IjNlMDNiMmEzLWNkM2EtNDZmNy1iMDUxLTc2YjQzMzQ0Zjk5MyIsImMiOjl9",img:"https://drive.google.com/file/d/1B7oZgPMxkAqdg8frki1fvQxq5goyzmRE/view?usp=sharing"}
+  ],
+  contacts:[
+    {icon:"fa-brands fa-whatsapp",title:"واتساب",value:"+966 53 346 9023",link:"https://wa.me/966533469023"},
+    {icon:"fa-solid fa-envelope",title:"البريد الإلكتروني",value:"mona.1424000@gmail.com",link:"mailto:mona.1424000@gmail.com"},
+    {icon:"fa-brands fa-linkedin",title:"LinkedIn",value:"منى محمد",link:"https://www.linkedin.com/in/منى-محمد-82883b210"}
+  ]
+};
+
+// ================== STATE ==================
+let data = load();
+
+function normalizeImg(url){
+  if(!url) return '';
+  url = String(url).trim();
+  let m = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=[^&]+&)?id=|thumbnail\?id=)|\/d\/)([a-zA-Z0-9_-]{20,})/);
+  if(m) return `https://lh3.googleusercontent.com/d/${m[1]}=w2000`;
+  return url;
+}
+
+function load(){
+  try{
+    const s = localStorage.getItem('monaPortfolioData');
+    if(s){
+      const d = JSON.parse(s);
+      // Auto-migration: update old description text
+      if(d.brand && d.brand.titles && d.brand.titles.includes('محللة أعمال') && d.brand.titles.includes('ذكاء أعمال')){
+        d.brand.titles = '<span class="lead">محللة بيانات وعمليات أعمال</span>أحوّل البيانات إلى رؤى واضحة، وأنظّم سير العمل لرفع كفاءة الأعمال.';
+        try{ localStorage.setItem('monaPortfolioData', JSON.stringify(d)); }catch(e){}
+      }
+      return d;
+    }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+
+function saveAll(){
+  bindingsToData();
+  localStorage.setItem('monaPortfolioData', JSON.stringify(data));
+  toast('تم حفظ جميع التعديلات بنجاح ✓','success');
+}
+
+function toast(msg,type){
+  const t = document.getElementById('toast');
+  const m = document.getElementById('toastMsg');
+  m.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  clearTimeout(window._t);
+  window._t = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// ================== BINDINGS (profile fields) ==================
+function get(path){ return path.split('.').reduce((o,k)=>o&&o[k], data); }
+function set(path,val){
+  const keys = path.split('.'); let o = data;
+  for(let i=0;i<keys.length-1;i++){ o[keys[i]] = o[keys[i]] || {}; o = o[keys[i]]; }
+  o[keys[keys.length-1]] = val;
+}
+function fillBindings(){
+  // Expand pills array to pill1/pill2/pill3 pseudo-fields
+  const pills = data.brand.pills || [];
+  data.brand.pill1 = pills[0] || '';
+  data.brand.pill2 = pills[1] || '';
+  data.brand.pill3 = pills[2] || '';
+  document.querySelectorAll('[data-bind]').forEach(el=>{
+    const v = get(el.dataset.bind);
+    if(v!==undefined) el.value = v;
+  });
+}
+function bindingsToData(){
+  document.querySelectorAll('[data-bind]').forEach(el=>{
+    set(el.dataset.bind, el.value);
+  });
+  // Collapse pill1/2/3 back into pills array
+  data.brand.pills = [data.brand.pill1, data.brand.pill2, data.brand.pill3].filter(p=>p && p.trim());
+  delete data.brand.pill1; delete data.brand.pill2; delete data.brand.pill3;
+}
+function updatePreview(){
+  bindingsToData();
+  document.getElementById('prevName').textContent = data.brand.name;
+  document.getElementById('prevRole').textContent = data.brand.role;
+  document.getElementById('prevInit').textContent = data.brand.initial;
+}
+
+// ================== TABS ==================
+document.querySelectorAll('.sb-nav button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('.sb-nav button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const t = b.dataset.tab;
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelector(`[data-panel="${t}"]`).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+});
+
+// ================== STATS ==================
+function renderStats(){
+  const wrap = document.getElementById('statsList');
+  wrap.innerHTML = data.stats.map((s,i)=>`
+    <div class="item">
+      <div class="item-head">
+        <div class="item-title"><i class="fa-solid fa-hashtag"></i> إحصائية ${i+1}</div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>الرقم</label>
+          <input value="${escapeAttr(s.n)}" oninput="data.stats[${i}].n=this.value" />
+        </div>
+        <div class="field">
+          <label>الوصف</label>
+          <input value="${escapeAttr(s.l)}" oninput="data.stats[${i}].l=this.value" />
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ================== GENERIC LIST RENDERERS ==================
+function escapeAttr(s){ return String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;') }
+
+function renderSkills(){
+  document.getElementById('skillsList').innerHTML = data.skills.map((s,i)=>`
+    <div class="item">
+      <div class="item-head">
+        <div class="item-title"><i class="${s.icon}"></i> ${escapeAttr(s.title)}</div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="moveItem('skills',${i},-1)"><i class="fa-solid fa-arrow-up"></i></button>
+          <button class="icon-btn" onclick="moveItem('skills',${i},1)"><i class="fa-solid fa-arrow-down"></i></button>
+          <button class="icon-btn del" onclick="removeItem('skills',${i})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="row-3">
+        <div class="field">
+          <label>الأيقونة (FontAwesome)</label>
+          <input value="${escapeAttr(s.icon)}" oninput="data.skills[${i}].icon=this.value" />
+          <small>مثال: fa-solid fa-chart-line</small>
+        </div>
+        <div class="field">
+          <label>العنوان</label>
+          <input value="${escapeAttr(s.title)}" oninput="data.skills[${i}].title=this.value" />
+        </div>
+        <div class="field">
+          <label>الوصف</label>
+          <input value="${escapeAttr(s.desc)}" oninput="data.skills[${i}].desc=this.value" />
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderClients(){
+  document.getElementById('clientsList').innerHTML = data.clients.map((c,i)=>`
+    <div class="item">
+      <div class="item-head">
+        <div class="item-title"><i class="${c.icon}"></i> ${escapeAttr(c.name)}</div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="moveItem('clients',${i},-1)"><i class="fa-solid fa-arrow-up"></i></button>
+          <button class="icon-btn" onclick="moveItem('clients',${i},1)"><i class="fa-solid fa-arrow-down"></i></button>
+          <button class="icon-btn del" onclick="removeItem('clients',${i})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>اسم الجهة</label>
+          <input value="${escapeAttr(c.name)}" oninput="data.clients[${i}].name=this.value" />
+        </div>
+        <div class="field">
+          <label>الأيقونة</label>
+          <input value="${escapeAttr(c.icon)}" oninput="data.clients[${i}].icon=this.value" />
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderProjects(){
+  document.getElementById('projectsList').innerHTML = data.projects.map((p,i)=>`
+    <div class="item">
+      <div class="item-head">
+        <div class="item-title"><i class="${escapeAttr(p.icon||'fa-solid fa-briefcase')}"></i> ${escapeAttr(p.title)}</div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="moveItem('projects',${i},-1)"><i class="fa-solid fa-arrow-up"></i></button>
+          <button class="icon-btn" onclick="moveItem('projects',${i},1)"><i class="fa-solid fa-arrow-down"></i></button>
+          <button class="icon-btn del" onclick="removeItem('projects',${i})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="row-3">
+        <div class="field">
+          <label>الأيقونة (FontAwesome) — ستظهر بجانب العنوان بلون بنفسجي</label>
+          <input value="${escapeAttr(p.icon||'fa-solid fa-chart-column')}" oninput="data.projects[${i}].icon=this.value; renderProjects()" placeholder="fa-solid fa-chart-line" />
+          <div style="margin-top:8px;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;text-align:center">
+            <i class="${escapeAttr(p.icon||'fa-solid fa-chart-column')}" style="font-size:24px;color:var(--gold);filter:drop-shadow(0 2px 8px rgba(124,58,237,.4))"></i>
+          </div>
+          <small>مثال: fa-solid fa-chart-line ، fa-brands fa-python ، fa-solid fa-database — تصفح <a href="https://fontawesome.com/search?ic=free" target="_blank" style="color:var(--gold)">مكتبة الأيقونات</a></small>
+        </div>
+        <div class="field">
+          <label>التصنيف / Tag</label>
+          <input value="${escapeAttr(p.tag)}" oninput="data.projects[${i}].tag=this.value" />
+        </div>
+        <div class="field">
+          <label>العنوان</label>
+          <input value="${escapeAttr(p.title)}" oninput="data.projects[${i}].title=this.value" />
+        </div>
+      </div>
+      <div class="field">
+        <label>الوصف</label>
+        <textarea rows="2" oninput="data.projects[${i}].desc=this.value">${escapeAttr(p.desc)}</textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>الأدوات المستخدمة (مفصولة بفاصلة)</label>
+          <input value="${escapeAttr((p.tech||[]).join(', '))}" oninput="data.projects[${i}].tech=this.value.split(',').map(x=>x.trim()).filter(Boolean)" />
+        </div>
+        <div class="field">
+          <label>رابط المشروع</label>
+          <input value="${escapeAttr(p.link)}" oninput="data.projects[${i}].link=this.value" />
+        </div>
+      </div>
+      <div class="field">
+        <label>🖼️ رابط صورة المشروع (اختياري)</label>
+        <input value="${escapeAttr(p.img||'')}" oninput="data.projects[${i}].img=this.value" placeholder="assets/project1.png أو https://..." />
+        <small>ارفع الصورة على imgbb.com أو في مجلد assets، والصق الرابط هنا. اترك الحقل فارغ ليظهر أيقونة افتراضية.</small>
+        ${p.img ? `<div style="margin-top:10px;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;text-align:center"><img src="${escapeAttr(normalizeImg(p.img))}" style="max-width:100%;max-height:120px;border-radius:6px" onerror="this.style.display='none'" referrerpolicy="no-referrer"/></div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderContacts(){
+  document.getElementById('contactsList').innerHTML = data.contacts.map((c,i)=>`
+    <div class="item">
+      <div class="item-head">
+        <div class="item-title"><i class="${c.icon}"></i> ${escapeAttr(c.title)}</div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="moveItem('contacts',${i},-1)"><i class="fa-solid fa-arrow-up"></i></button>
+          <button class="icon-btn" onclick="moveItem('contacts',${i},1)"><i class="fa-solid fa-arrow-down"></i></button>
+          <button class="icon-btn del" onclick="removeItem('contacts',${i})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>عنوان القناة</label>
+          <input value="${escapeAttr(c.title)}" oninput="data.contacts[${i}].title=this.value" />
+        </div>
+        <div class="field">
+          <label>الأيقونة</label>
+          <input value="${escapeAttr(c.icon)}" oninput="data.contacts[${i}].icon=this.value" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>القيمة (النص الظاهر)</label>
+          <input value="${escapeAttr(c.value)}" oninput="data.contacts[${i}].value=this.value" />
+        </div>
+        <div class="field">
+          <label>الرابط</label>
+          <input value="${escapeAttr(c.link)}" oninput="data.contacts[${i}].link=this.value" />
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ================== ITEM OPS ==================
+function addItem(key, item){
+  data[key].push(item);
+  renderAll();
+  toast('تمت الإضافة — لا تنسَ الحفظ','success');
+}
+function removeItem(key, i){
+  data[key].splice(i,1);
+  renderAll();
+  toast('تم الحذف','success');
+}
+function moveItem(key,i,dir){
+  const j=i+dir; if(j<0||j>=data[key].length) return;
+  [data[key][i],data[key][j]] = [data[key][j],data[key][i]];
+  renderAll();
+}
+
+// ================== RENDER ALL ==================
+function renderAll(){
+  fillBindings();
+  updatePreview();
+  renderStats();
+  renderSkills();
+  renderClients();
+  renderProjects();
+  renderContacts();
+}
+
+// ================== EXPORT / IMPORT ==================
+function exportJSON(){
+  bindingsToData();
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mona-portfolio-data.json';
+  a.click();
+}
+function importJSON(input){
+  const file = input.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      data = JSON.parse(r.result);
+      renderAll();
+      toast('تم استيراد البيانات — اضغط حفظ للتفعيل','success');
+    }catch(e){ toast('ملف JSON غير صالح','error'); }
+  };
+  r.readAsText(file);
+  input.value='';
+}
+function exportExcel(){
+  bindingsToData();
+  const wb = XLSX.utils.book_new();
+
+  // Brand sheet
+  const brandRows = Object.entries(data.brand).map(([k,v])=>({Field:k,Value:v}));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(brandRows), 'Profile');
+
+  // Stats
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.stats.map(s=>({Number:s.n,Label:s.l}))), 'Stats');
+  // Skills
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.skills), 'Skills');
+  // Clients
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.clients), 'Clients');
+  // Projects
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.projects.map(p=>({...p, tech:(p.tech||[]).join(', ')}))), 'Projects');
+  // Contacts
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.contacts), 'Contacts');
+
+  XLSX.writeFile(wb, 'قاعدة_بيانات_منى.xlsx');
+}
+function importExcel(input){
+  const file = input.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e=>{
+    try{
+      const wb = XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const g = n => wb.Sheets[n] ? XLSX.utils.sheet_to_json(wb.Sheets[n]) : null;
+      const b = g('Profile');
+      if(b){ b.forEach(r=>{ if(r.Field && r.Value!==undefined) data.brand[r.Field] = r.Value; }); }
+      const st = g('Stats'); if(st) data.stats = st.map(x=>({n:x.Number, l:x.Label}));
+      const sk = g('Skills'); if(sk) data.skills = sk;
+      const cl = g('Clients'); if(cl) data.clients = cl;
+      const pr = g('Projects'); if(pr) data.projects = pr.map(p=>({...p, tech: typeof p.tech==='string' ? p.tech.split(',').map(x=>x.trim()).filter(Boolean) : p.tech}));
+      const co = g('Contacts'); if(co) data.contacts = co;
+      renderAll();
+      toast('تم استيراد Excel بنجاح — اضغط حفظ للتفعيل','success');
+    }catch(err){ toast('خطأ في قراءة الملف','error'); console.error(err); }
+  };
+  r.readAsArrayBuffer(file);
+  input.value='';
+}
+
+// ================== MODAL ==================
+function openModal(title,body,onOk){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modal').classList.add('show');
+  document.getElementById('modalOk').onclick = ()=>{ closeModal(); onOk(); };
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function confirmReset(){
+  openModal('إعادة ضبط','هل أنت متأكد من استعادة كل الإعدادات للقيم الافتراضية؟ هذا الإجراء لا يمكن التراجع عنه.',()=>{
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    localStorage.removeItem('monaPortfolioData');
+    renderAll();
+    toast('تم استعادة الإعدادات الافتراضية','success');
+  });
+}
+document.getElementById('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
+
+// ================== INIT ==================
+renderAll();
+
+// Auto-save gentle: Ctrl+S
+window.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==='s'){ e.preventDefault(); saveAll(); }
+});
+</script>
+</body>
+</html>
